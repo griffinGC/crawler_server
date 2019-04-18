@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var weatherRouter = require('./routes/weather');
-
+var dinerRouter = require('./routes/diner');
 
 var app = express();
 
@@ -35,8 +35,11 @@ app.use('/', indexRouter);
 //여기서 '/user'라고 적어주면 밑에서는 '/'만 적어도 됨 
 app.use('/users', usersRouter);
 
-//login 기능 라우터 
+//날씨정보 기능 라우터 
 app.use('/weather',weatherRouter);
+//식당정보 기능 라우터 
+app.use('/diner',dinerRouter);
+// app.use('/diner', dinerRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

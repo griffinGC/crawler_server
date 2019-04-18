@@ -1,7 +1,8 @@
+const express = require('express');
+const router = express.Router();
 const crawler = require('crawler-request');
 var cheerio = require('cheerio');
 //cheerio를 이용해서 크롤링 불가.. => crawler-request사용 
-
 const fs = require('fs');
 var url = "http://www.ajou.ac.kr/main/life/food.jsp";
 
@@ -16,7 +17,7 @@ let officeDiner1;
 let officeDiner2;
 
 var strArray;
-// const dinerList = [unionDiner, domDiner, officeDiner1, officeDiner2];
+const dinerList = [unionDiner, domDiner, officeDiner1, officeDiner2];
 
 //식단 찾는것 자체를 함수화
 function findDiner(diner){
@@ -27,7 +28,7 @@ function findDiner(diner){
 
     if(diner.indexOf('등록된 식단이 없습니다.') != -1)
     {
-        console.log(diner[2]);
+        // console.log(diner[2]);
         //리턴
         return;
     }else{
@@ -36,53 +37,65 @@ function findDiner(diner){
         let d = diner.indexOf('저녁');
         let s = diner.indexOf('분식');
 
-        if(m != -1){
-            for(let i = m; i<l; i++){
-                // console.log(stuDiner[i])
-                stuDinerM = stuDinerM.concat(diner[i]+'\n');
-            }
-        }
-        if(l != -1){
-            for(let i = l; i<d; i++){
-                // console.log(stuDiner[i])
+        //학식
+        if((m== -1)&& (l!=-1) && (d == -1))
+        {
+            for(let i = 2; i<s; i++)
+            {
                 stuDinerL = stuDinerL.concat(diner[i]+'\n');
             }
+            for(let i = s; i<diner.length; i++)
+            {
+                stuDinerS = stuDinerS.concat(diner[i]+'\n');
+            }
+            diner ="";
+            diner = [stuDinerL,stuDinerS];
+            return diner;
         }
-        if(d != -1){
-            if(s != -1){
-                for(let j = d; j<s;j++){
-                    stuDinerD = stuDinerD.concat(diner[j]+'\n');
-                }                
-            }
-            else{
-                for(let j = d; j<diner.length;j++){
-                    stuDinerD = stuDinerD.concat(diner[j]+'\n');
-                }
-            }
 
-        }
-        if(s != -1){
-            for(let k = s; k<diner.length;k++){
-                stuDinerS = stuDinerS.concat(diner[k]+'\n');
+        //기식
+        if((m!= -1) && (l!= -1) && (d != -1))
+        {
+            for(let i = m; i< l; i++)
+            {
+                stuDinerM = stuDinerM.concat(diner[i] + '\n');
             }
+            for(let i = l; i< d; i++)
+            {
+                stuDinerL = stuDinerL.concat(diner[i] + '\n');
+            }
+            for(let i = d; i< diner.length; i++)
+            {
+                stuDinerD = stuDinerD.concat(diner[i] + '\n');
+            }
+            diner ="";
+            diner = [stuDinerM,stuDinerL,stuDinerD];
+            return diner;
         }
-        // console.log(stuDinerL);
-        // console.log('\n');
-        // console.log(stuDinerD);
-        // console.log('\n');
-        // console.log(stuDinerS);
-        diner = "";
-        diner = [stuDinerM, stuDinerL, stuDinerD, stuDinerS];
-        // stuDinerM ="", stuDinerL="",stuDinerD="",stuDinerS="";
-        // console.log(diner);
-        return diner;
+        //교식
+        if((m == -1) && (l != -1) && (d != -1))
+        {
+            for(let i = l; i<d; i++)
+            {
+                stuDinerL = stuDinerL.concat(diner[i]+'\n');
+            }
+            for(let i = d; i<diner.length; i++)
+            {
+                stuDinerD = stuDinerD.concat(diner[i]+'\n');
+            }
+            diner ="";
+            diner = [stuDinerL,stuDinerD];
+            return diner;
+        }
     }
 
 }
 
-crawler(url).then(function(response){
-    // console.log(response.html);
 
+
+router.post('/0', (req, res)=>{
+    crawler(url).then(function(response){
+       
     //보완필요
     var $ = cheerio.load(response.html);
 
@@ -105,11 +118,13 @@ crawler(url).then(function(response){
         
         if(idx == 0){
             unionDiner = strArray;
+            // console.log(strArray);
             unionDiner = findDiner(unionDiner);  
             // console.log(unionDiner);
 
         }else if(idx == 1){
             domDiner = strArray;
+            // console.log(strArray);
             domDiner = findDiner(domDiner);
             // console.log(domDiner);
 
@@ -125,5 +140,15 @@ crawler(url).then(function(response){
 
         }  
     })
-    
-});
+    console.log(unionDiner);
+    console.log(domDiner);
+    const responseBody ={
+            version : "2.0",
+            data :{
+                msg : `${unionDiner}`
+            }
+        }
+        res.status(200).send(responseBody);
+    });
+})
+module.exports = router;
