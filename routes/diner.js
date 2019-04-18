@@ -29,8 +29,12 @@ function findDiner(diner){
     if(diner.indexOf('등록된 식단이 없습니다.') != -1)
     {
         // console.log(diner[2]);
+        var temp = diner[2];
+        console.log(temp);
+        diner = "";
+        diner = [temp,temp];
         //리턴
-        return;
+        return diner;
     }else{
         let m = diner.indexOf('아침');
         let l = diner.indexOf('점심');
@@ -91,8 +95,6 @@ function findDiner(diner){
 
 }
 
-
-
 router.post('/0', (req, res)=>{
     crawler(url).then(function(response){
        
@@ -122,33 +124,119 @@ router.post('/0', (req, res)=>{
             unionDiner = findDiner(unionDiner);  
             // console.log(unionDiner);
 
-        }else if(idx == 1){
+        }  
+    });
+    console.log(unionDiner);
+    var result = unionDiner[0] + unionDiner[1]
+    const responseBody ={
+            version : "2.0",
+            data :{
+                msg : `${result}`
+            }
+        };
+        res.status(200).send(responseBody);
+    });
+});
+
+router.post('/1/:id', (req, res)=>{
+    crawler(url).then(function(response){
+       
+    //보완필요
+    var $ = cheerio.load(response.html);
+
+
+    //tri_list02 이용해서 가져오면 식단 없을경우 크롤링 불가. 
+    //여기는 앞뒤가 생략가능함
+    $('table.ajou_table').each(function(idx){ 
+        //문자열을 한줄씩 배열에 넣어 쪼개고 개행키는 삭제 다시 한줄씩 출력 
+        var diner = $(this).text();
+        //개행키로 나눔 
+        strArray = diner.split('\n');
+        //기존에 존재하는 문자열의 앞뒤 공백 삭제 
+        for(let i = 0; i<strArray.length; i++){
+            strArray[i] = strArray[i].trim();
+        }
+        //값이 존재하는것 들만 필터링 함
+        strArray = strArray.filter(n=>n);
+        // console.log(strArray);
+        if(idx == 1){
             domDiner = strArray;
             // console.log(strArray);
             domDiner = findDiner(domDiner);
             // console.log(domDiner);
 
-        }else if(idx == 2){
-            officeDiner1 = strArray;
-            officeDiner1 = findDiner(officeDiner1);
-            // console.log(officeDiner1);
-
-        }else if(idx == 3){
-            officeDiner2 = strArray;
-            officeDiner2 = findDiner(officeDiner2);
-            // console.log(officeDiner2);
-
         }  
-    })
-    console.log(unionDiner);
-    console.log(domDiner);
+    });
+    var result ="";
+    if(req.params.id == 0)
+    {
+        result = domDiner[0];
+        console.log(domDiner[0]);
+    }else if(req.params.id == 1){
+        result = domDiner[1];
+        console.log(domDiner[1]);
+    }else if(req.params.id == 2){
+        result = domDiner[2];
+        console.log(domDiner[2]);
+    }
+    
     const responseBody ={
             version : "2.0",
             data :{
-                msg : `${unionDiner}`
+                msg : `${result}`
             }
-        }
+        };
         res.status(200).send(responseBody);
     });
-})
+});
+
+
+router.post('/2/:id', (req, res)=>{
+    crawler(url).then(function(response){
+       
+    //보완필요
+    var $ = cheerio.load(response.html);
+
+
+    //tri_list02 이용해서 가져오면 식단 없을경우 크롤링 불가. 
+    //여기는 앞뒤가 생략가능함
+    $('table.ajou_table').each(function(idx){ 
+        //문자열을 한줄씩 배열에 넣어 쪼개고 개행키는 삭제 다시 한줄씩 출력 
+        var diner = $(this).text();
+        //개행키로 나눔 
+        strArray = diner.split('\n');
+        //기존에 존재하는 문자열의 앞뒤 공백 삭제 
+        for(let i = 0; i<strArray.length; i++){
+            strArray[i] = strArray[i].trim();
+        }
+        //값이 존재하는것 들만 필터링 함
+        strArray = strArray.filter(n=>n);
+        // console.log(strArray);
+        if(idx == 2){
+            officeDiner1 = strArray;
+            officeDiner1 = findDiner(officeDiner1);
+            // console.log(officeDiner1 + "1");
+
+        }
+    });
+    var result ="";
+    if(req.params.id == 0)
+    {
+        result = officeDiner1[0];
+        console.log(officeDiner1[0]);
+    }else if(req.params.id == 1){
+        result = officeDiner1[1];
+        console.log(officeDiner1[1]);
+    }
+    
+    const responseBody ={
+            version : "2.0",
+            data :{
+                msg : `${result}`
+            }
+        };
+        res.status(200).send(responseBody);
+    });
+});
+
 module.exports = router;
