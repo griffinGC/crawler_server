@@ -11,16 +11,16 @@ router.post('/', function(req,res,err){
 	request(url, function(err, response, body){
     var $ = cheerio.load(body);
 	var where = $('h3.api_title').text();
-	// console.log(where);
 	var todayTemp = $('span.todaytemp').first().text();
     var txt = $('p.cast_txt').first().text();
-    // console.log(txt);
     var totalText = `오늘 아주대 ${where}는 ${txt}.`+'\n'+`현재기온은 ${todayTemp}도 입니다.`;
-    console.log(totalText);
-    // console.log('2');
+    // console.log(totalText);
 	var result;
     var resultList=['좋음','보통','나쁨','매우 나쁨']
-    var dust;
+	var dust;
+	
+	//url 2개여서 2번 사용함 비동기이기 때문에 안에 넣어줌 
+	//미세먼지 크롤링 주소는 다름 
     request(url2, function(err, response, body){
         var $ = cheerio.load(body);
         dust = $('em.main_figure').text();
@@ -39,9 +39,9 @@ router.post('/', function(req,res,err){
         }
         dust = dust + '㎍/㎥';
         result = `미세먼지 수치는 ${dust}이고, 상태는 ${result}입니다.`
-        //미세먼지
-		console.log(result);
+		// console.log(result);
 		result = totalText +"\n"+ result;
+		//전송형식
 			const responseBody ={
 				version : "2.0",
 				data :{

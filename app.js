@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var weatherRouter = require('./routes/weather');
 var dinerRouter = require('./routes/diner');
+var libraryRouter = require('./routes/library');
 
 var app = express();
 
@@ -39,7 +40,8 @@ app.use('/users', usersRouter);
 app.use('/weather',weatherRouter);
 //식당정보 기능 라우터 
 app.use('/diner',dinerRouter);
-// app.use('/diner', dinerRouter);
+//도서관여석 기능 라우터
+app.use('/library', libraryRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
