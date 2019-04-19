@@ -127,7 +127,7 @@ router.post('/0', (req, res)=>{
         }  
     });
     console.log(unionDiner);
-    var result = unionDiner[0] + unionDiner[1]
+    var result = unionDiner[0] + unionDiner[1];
     const responseBody ={
             version : "2.0",
             data :{
