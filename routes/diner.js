@@ -6,18 +6,12 @@ var cheerio = require('cheerio');
 const fs = require('fs');
 var url = "http://www.ajou.ac.kr/main/life/food.jsp";
 
-//enter를 없애기 위해서 삽입
-const enterReg = /(\r\n|\n|\r)/gm;
 let unionDiner;
-
 let domDiner;
-
 let officeDiner1;
-
 let officeDiner2;
 
 var strArray;
-const dinerList = [unionDiner, domDiner, officeDiner1, officeDiner2];
 
 //식단 찾는것 자체를 함수화
 function findDiner(diner){
@@ -57,7 +51,7 @@ function findDiner(diner){
             return diner;
         }
 
-        //기식
+        //기식 => 평일
         if((m!= -1) && (l!= -1) && (d != -1))
         {
             for(let i = m+1; i< l; i++)
@@ -72,6 +66,7 @@ function findDiner(diner){
             {
                 stuDinerD = stuDinerD.concat(diner[i] + '\n');
             }
+            console.log(m + "morning");
             diner ="";
             diner = [stuDinerM,stuDinerL,stuDinerD];
             return diner;
@@ -98,10 +93,7 @@ function findDiner(diner){
 router.post('/0', (req, res)=>{
     crawler(url).then(function(response){
        
-    //보완필요
     var $ = cheerio.load(response.html);
-
-
     //tri_list02 이용해서 가져오면 식단 없을경우 크롤링 불가. 
     //여기는 앞뒤가 생략가능함
     $('table.ajou_table').each(function(idx){ 
@@ -116,14 +108,12 @@ router.post('/0', (req, res)=>{
         //값이 존재하는것 들만 필터링 함
         strArray = strArray.filter(n=>n);
         // console.log(strArray);
-
-        
+ 
         if(idx == 0){
             unionDiner = strArray;
             // console.log(strArray);
             unionDiner = findDiner(unionDiner);  
             // console.log(unionDiner);
-
         }  
     });
     console.log(unionDiner);
@@ -141,9 +131,7 @@ router.post('/0', (req, res)=>{
 router.post('/1/:id', (req, res)=>{
     crawler(url).then(function(response){
        
-    //보완필요
     var $ = cheerio.load(response.html);
-
 
     //tri_list02 이용해서 가져오면 식단 없을경우 크롤링 불가. 
     //여기는 앞뒤가 생략가능함
@@ -164,22 +152,35 @@ router.post('/1/:id', (req, res)=>{
             // console.log(strArray);
             domDiner = findDiner(domDiner);
             // console.log(domDiner);
-
         }  
     });
     var result ="";
-    if(req.params.id == 0)
-    {
-        result = domDiner[0];
-        console.log(domDiner[0]);
-    }else if(req.params.id == 1){
-        result = domDiner[1];
-        console.log(domDiner[1]);
-    }else if(req.params.id == 2){
-        result = domDiner[2];
-        console.log(domDiner[2]);
+    if(domDiner.length == 3){
+        if(req.params.id == 0)
+        {
+            result = domDiner[0];
+            console.log(domDiner[0]);
+        }else if(req.params.id == 1){
+            result = domDiner[1];
+            console.log(domDiner[1]);
+        }else if(req.params.id == 2){
+            result = domDiner[2];
+            console.log(domDiner[2]);
+        }        
+    }else if(domDiner.length == 2){
+        if(req.params.id == 0)
+        {
+            result = "등록된 식단이 없습니다.";
+            console.log(result);
+        }else if(req.params.id == 1){
+            result = domDiner[0];
+            console.log(domDiner[0]);
+        }else if(req.params.id == 2){
+            result = domDiner[1];
+            console.log(domDiner[1]);
+        }
     }
-    
+
     const responseBody ={
             version : "2.0",
             data :{
@@ -194,9 +195,7 @@ router.post('/1/:id', (req, res)=>{
 router.post('/2/:id', (req, res)=>{
     crawler(url).then(function(response){
        
-    //보완필요
     var $ = cheerio.load(response.html);
-
 
     //tri_list02 이용해서 가져오면 식단 없을경우 크롤링 불가. 
     //여기는 앞뒤가 생략가능함
@@ -215,8 +214,6 @@ router.post('/2/:id', (req, res)=>{
         if(idx == 2){
             officeDiner1 = strArray;
             officeDiner1 = findDiner(officeDiner1);
-            // console.log(officeDiner1 + "1");
-
         }
     });
     var result ="";
