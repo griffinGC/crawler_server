@@ -44,7 +44,7 @@ function findDiner(diner){
         //학식
         if((m== -1)&& (l!=-1) && (d == -1))
         {
-            for(let i = 2; i<s; i++)
+            for(let i = 3; i<s; i++)
             {
                 stuDinerL = stuDinerL.concat(diner[i]+'\n');
             }
@@ -60,15 +60,15 @@ function findDiner(diner){
         //기식
         if((m!= -1) && (l!= -1) && (d != -1))
         {
-            for(let i = m; i< l; i++)
+            for(let i = m+1; i< l; i++)
             {
                 stuDinerM = stuDinerM.concat(diner[i] + '\n');
             }
-            for(let i = l; i< d; i++)
+            for(let i = l+1; i< d; i++)
             {
                 stuDinerL = stuDinerL.concat(diner[i] + '\n');
             }
-            for(let i = d; i< diner.length; i++)
+            for(let i = d+1; i< diner.length; i++)
             {
                 stuDinerD = stuDinerD.concat(diner[i] + '\n');
             }
@@ -79,11 +79,11 @@ function findDiner(diner){
         //교식
         if((m == -1) && (l != -1) && (d != -1))
         {
-            for(let i = l; i<d; i++)
+            for(let i = l+1; i<d; i++)
             {
                 stuDinerL = stuDinerL.concat(diner[i]+'\n');
             }
-            for(let i = d; i<diner.length; i++)
+            for(let i = d+1; i<diner.length; i++)
             {
                 stuDinerD = stuDinerD.concat(diner[i]+'\n');
             }
