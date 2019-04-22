@@ -117,7 +117,14 @@ router.post('/0', (req, res)=>{
         }  
     });
     console.log(unionDiner);
-    var result = unionDiner[0] + unionDiner[1];
+    var result= "";
+    if(unionDiner[0] == unionDiner[1])
+    {
+        result = unionDiner[0];
+    }else{
+        result = unionDiner[0] + unionDiner[1];
+    }
+    
     const responseBody ={
             version : "2.0",
             data :{

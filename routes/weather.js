@@ -35,7 +35,7 @@ router.post('/', function(req,res,err){
         {
             result = resultList[2];
         }else{
-            result = reusltList[3];
+            result = resultList[3];
         }
         dust = dust + '㎍/㎥';
         result = `미세먼지 수치는 ${dust}이고, 상태는 ${result}입니다.`
